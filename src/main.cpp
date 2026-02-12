@@ -2,7 +2,16 @@
 
 // put function declarations here:
 
-int chooseMode(enum motion);
+/*
+function chooseMode chooses whether the robot goes forwards, backwards, left, or right based on input m
+*/
+int chooseMode(motion m);
+
+/*
+enum to define the cases that the motors will go through
+*/
+enum motion {FORWARD, BACK, LEFT, RIGHT, STAY};
+  
 
 int in1_1 = 4;
 int in1_2 = 5;
@@ -11,27 +20,27 @@ int in2_2 = 7;
 motion checkMotion;
 
 void setup() {
-  // put your setup code here, to run once:
-  pinMode(in1_1, OUTPUT);
-  pinMode(in1_2, OUTPUT);
-  pinMode(in2_1, OUTPUT);
-  pinMode(in2_2, OUTPUT);
-  enum motion {FORWARD, BACK, LEFT, RIGHT};
+  pinMode(in1_1, OUTPUT); //
+  pinMode(in1_2, OUTPUT); //
+  pinMode(in2_1, OUTPUT); //
+  pinMode(in2_2, OUTPUT); //
+  motion m = STAY;
 }
 
 void loop() {
-  motion = FORWARD;
+  motion m;
+  m = FORWARD;
   delay(2000);
-  motion = BACK;
+  m = BACK;
   delay(2000);
-  motion = LEFT;
+  m = LEFT;
   delay(2000);
-  motion = RIGHT;
+  m = RIGHT;
   delay(2000);
 }
 
-int chooseMode(enum motion) {
-  switch (motion) {
+int chooseMode(motion m) {
+  switch (m) {
     case FORWARD:
     //left motors
       digitalWrite(in1_1, HIGH);
@@ -79,6 +88,8 @@ int chooseMode(enum motion) {
       digitalWrite(in1_2, LOW);
       digitalWrite(in1_1, HIGH);
       digitalWrite(in1_2, HIGH);
+    break;
+    case STAY:
     break;
   }
 
