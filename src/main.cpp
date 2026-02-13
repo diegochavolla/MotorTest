@@ -1,96 +1,113 @@
 #include <Arduino.h>
 
-// put function declarations here:
-
-/*
-function chooseMode chooses whether the robot goes forwards, backwards, left, or right based on input m
-*/
-int chooseMode(motion m);
-
-/*
-enum to define the cases that the motors will go through
-*/
 enum motion {FORWARD, BACK, LEFT, RIGHT, STAY};
-  
 
-int in1_1 = 4;
-int in1_2 = 5;
-int in2_1 = 6;
-int in2_2 = 7;
-motion checkMotion;
+// Motor A (Left)
+const int IN1 = 4;
+const int IN2 = 5;
+const int ENA = 9;   // PWM
+
+// Motor B (Right)
+const int IN3 = 6;
+const int IN4 = 7;
+const int ENB = 10;  // PWM
+
+const int DEFAULT_SPEED = 200;  // 0–255
+
+void chooseMode(motion m, int speed);
+motion convertCommand(char c);
 
 void setup() {
-  pinMode(in1_1, OUTPUT); //
-  pinMode(in1_2, OUTPUT); //
-  pinMode(in2_1, OUTPUT); //
-  pinMode(in2_2, OUTPUT); //
-  motion m = STAY;
+
+  Serial.begin(9600);
+
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+  pinMode(ENA, OUTPUT);
+
+  pinMode(IN3, OUTPUT);
+  pinMode(IN4, OUTPUT);
+  pinMode(ENB, OUTPUT);
+
+  chooseMode(STAY, 0);
 }
 
 void loop() {
-  motion m;
-  m = FORWARD;
-  delay(2000);
-  m = BACK;
-  delay(2000);
-  m = LEFT;
-  delay(2000);
-  m = RIGHT;
-  delay(2000);
+
+  if (Serial.available()) {
+
+    char direction = Serial.read();
+
+    // If stop command
+    if (direction == 'S') {
+      chooseMode(STAY, 0);
+      return;
+    }
+
+    // Read movement duration (milliseconds)
+    int duration = Serial.parseInt();
+
+    motion m = convertCommand(direction);
+
+    chooseMode(m, DEFAULT_SPEED);
+
+    delay(duration);
+
+    chooseMode(STAY, 0);
+  }
 }
 
-int chooseMode(motion m) {
+motion convertCommand(char c) {
+  switch (c) {
+    case 'F': return FORWARD;
+    case 'B': return BACK;
+    case 'L': return LEFT;
+    case 'R': return RIGHT;
+    default:  return STAY;
+  }
+}
+
+void chooseMode(motion m, int speed) {
+
   switch (m) {
+
     case FORWARD:
-    //left motors
-      digitalWrite(in1_1, HIGH);
-      digitalWrite(in1_2, LOW);
-      digitalWrite(in1_1, HIGH);
-      digitalWrite(in1_2, HIGH);
-    //right motors
-      digitalWrite(in1_1, HIGH);
-      digitalWrite(in1_2, LOW);
-      digitalWrite(in1_1, HIGH);
-      digitalWrite(in1_2, HIGH);
-    break;
+      digitalWrite(IN1, HIGH);
+      digitalWrite(IN2, LOW);
+      digitalWrite(IN3, HIGH);
+      digitalWrite(IN4, LOW);
+      break;
+
     case BACK:
-    //left motors
-      digitalWrite(in1_1, LOW);
-      digitalWrite(in1_2, HIGH);
-      digitalWrite(in1_1, HIGH);
-      digitalWrite(in1_2, HIGH);
-    //right motors
-      digitalWrite(in1_1, LOW);
-      digitalWrite(in1_2, HIGH);
-      digitalWrite(in1_1, HIGH);
-      digitalWrite(in1_2, HIGH);
-    break;
+      digitalWrite(IN1, LOW);
+      digitalWrite(IN2, HIGH);
+      digitalWrite(IN3, LOW);
+      digitalWrite(IN4, HIGH);
+      break;
+
     case LEFT:
-    //left motors
-      digitalWrite(in1_1, HIGH);
-      digitalWrite(in1_2, LOW);
-      digitalWrite(in1_1, HIGH);
-      digitalWrite(in1_2, HIGH);
-    //right motors
-      digitalWrite(in1_1, LOW);
-      digitalWrite(in1_2, HIGH);
-      digitalWrite(in1_1, HIGH);
-      digitalWrite(in1_2, HIGH);
-    break;
+      digitalWrite(IN1, LOW);
+      digitalWrite(IN2, HIGH);
+      digitalWrite(IN3, HIGH);
+      digitalWrite(IN4, LOW);
+      break;
+
     case RIGHT:
-    //left motors
-      digitalWrite(in1_1, LOW);
-      digitalWrite(in1_2, HIGH);
-      digitalWrite(in1_1, HIGH);
-      digitalWrite(in1_2, HIGH);
-    //right motors
-      digitalWrite(in1_1, HIGH);
-      digitalWrite(in1_2, LOW);
-      digitalWrite(in1_1, HIGH);
-      digitalWrite(in1_2, HIGH);
-    break;
+      digitalWrite(IN1, HIGH);
+      digitalWrite(IN2, LOW);
+      digitalWrite(IN3, LOW);
+      digitalWrite(IN4, HIGH);
+      break;
+
     case STAY:
-    break;
+      digitalWrite(IN1, LOW);
+      digitalWrite(IN2, LOW);
+      digitalWrite(IN3, LOW);
+      digitalWrite(IN4, LOW);
+      speed = 0;
+      break;
   }
 
+  analogWrite(ENA, speed);
+  analogWrite(ENB, speed);
 }
