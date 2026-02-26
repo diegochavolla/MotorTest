@@ -12,14 +12,17 @@ const int IN3 = 6;
 const int IN4 = 7;
 const int ENB = 10;  // PWM
 
+const int TEST_SPEED = 200;  // 0–255
+
 const int DEFAULT_SPEED = 200;  // 0–255
 
-void chooseMode(motion m, int speed);
+void drive(motion m, int speed);
+
 motion convertCommand(char c);
 
 void setup() {
 
-  Serial.begin(9600);
+  //Serial.begin(9600); //uncomment for working model
 
   pinMode(IN1, OUTPUT);
   pinMode(IN2, OUTPUT);
@@ -29,32 +32,88 @@ void setup() {
   pinMode(IN4, OUTPUT);
   pinMode(ENB, OUTPUT);
 
-  chooseMode(STAY, 0);
+  drive(STAY, 0);
 }
 
-void loop() {
+/**
+ * Example of python implementation for pi
+ * 
+import serial
+import time
 
-  if (Serial.available()) {
+ser = serial.Serial('/dev/ttyUSB0', 9600)
+time.sleep(2)
 
-    char direction = Serial.read();
+ser.write(b'F3000')  # forward 3 seconds
+time.sleep(4)
 
-    // If stop command
-    if (direction == 'S') {
-      chooseMode(STAY, 0);
-      return;
-    }
+ser.write(b'L800')   # turn left
+time.sleep(1)
 
-    // Read movement duration (milliseconds)
-    int duration = Serial.parseInt();
+ser.write(b'S')      # stop
+ */
+// void loop() { //uncomment for working model
 
-    motion m = convertCommand(direction);
+//   if (Serial.available()) {
 
-    chooseMode(m, DEFAULT_SPEED);
+//     char direction = Serial.read();
 
-    delay(duration);
+//     // If stop command
+//     if (direction == 'S') {
+//       drive(STAY, 0);
+//       return;
+//     }
 
-    chooseMode(STAY, 0);
-  }
+//     // Read movement duration (milliseconds)
+//     int duration = Serial.parseInt();
+
+//     motion m = convertCommand(direction);
+
+//     drive(m, DEFAULT_SPEED);
+
+//     delay(duration);
+
+//     drive(STAY, 0);
+//   }
+// }
+
+void loop() { //testing loop, comment for working model
+
+  // STOP
+  drive(STAY, 0);
+  delay(2000);
+
+  // FORWARD
+  drive(FORWARD, TEST_SPEED);
+  delay(3000);
+
+  // STOP
+  drive(STAY, 0);
+  delay(1000);
+
+  // BACKWARD
+  drive(BACK, TEST_SPEED);
+  delay(3000);
+
+  // STOP
+  drive(STAY, 0);
+  delay(1000);
+
+  // TURN LEFT
+  drive(LEFT, TEST_SPEED);
+  delay(1500);
+
+  // STOP
+  drive(STAY, 0);
+  delay(1000);
+
+  // TURN RIGHT
+  drive(RIGHT, TEST_SPEED);
+  delay(1500);
+
+  // STOP
+  drive(STAY, 0);
+  delay(3000);
 }
 
 motion convertCommand(char c) {
@@ -67,7 +126,7 @@ motion convertCommand(char c) {
   }
 }
 
-void chooseMode(motion m, int speed) {
+void drive(motion m, int speed) {
 
   switch (m) {
 
