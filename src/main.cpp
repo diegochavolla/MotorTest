@@ -2,12 +2,12 @@
 
 enum motion {FORWARD, BACK, LEFT, RIGHT, STAY};
 
-// Motor A (Left)
+// Left side
 const int IN1 = 4;
 const int IN2 = 5;
 const int ENA = 9;   // PWM
 
-// Motor B (Right)
+// Right side
 const int IN3 = 6;
 const int IN4 = 7;
 const int ENB = 10;  // PWM
